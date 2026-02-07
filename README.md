@@ -5,7 +5,7 @@
 
 ---
 
-## �️ Tech Stack
+## ⚙ Tech Stack
 
 - **Frontend**: Vanilla JavaScript (ES6), HTML5 Canvas, CSS3
 - **Audio**: Tone.js (v14.8.49)
