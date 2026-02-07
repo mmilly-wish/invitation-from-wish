@@ -1,0 +1,526 @@
+:root {
+    --bg-color: #0b0b0b;
+    --text-color: #dcdcdc;
+    --accent-color: #dcdcdc;
+    /* Monochromatic feel */
+    --error-color: #bfa3a3;
+    /* Desaturated red */
+    --font-main: 'Ycomputer', monospace;
+    /* Coding font stack with D2Coding for Korean */
+}
+
+@font-face {
+    font-family: 'Ycomputer';
+    src: url('../font/Ycomputer.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    overflow: hidden;
+    /* No scrollbars */
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+    /* Force no horizontal scroll */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* Use % instead of vw to avoid scrollbar overlap */
+    height: 100%;
+    /* Use % instead of vh for robustness */
+    background: radial-gradient(circle, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+#scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* Use % instead of vw */
+    height: 100%;
+    /* Use % instead of vh */
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0) 50%,
+            rgba(0, 0, 0, 0.2) 50%,
+            rgba(0, 0, 0, 0.2));
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 1001;
+    animation: scanlineScroll 10s linear infinite;
+    opacity: 0.3;
+}
+
+@keyframes scanlineScroll {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 0 100%;
+    }
+}
+
+#terminal-container {
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+/* Desktop: Horizontal Layout */
+/* Desktop: Centered Vertical Layout (Web) */
+/* Desktop: Centered Vertical Layout (Web) */
+@media (min-width: 768px) {
+    #terminal-container {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        /* Vertically centered per directive */
+        max-width: 720px;
+        /* Strict constraint */
+        width: 100%;
+        margin: 0 auto;
+        padding: 40px;
+        /* Ensure background visible */
+        font-size: clamp(0.7rem, 1.1vw, 1.1rem);
+        /* Smaller font */
+    }
+
+    #visual-canvas {
+        width: 100%;
+        max-width: 580px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        object-fit: contain;
+        image-rendering: pixelated;
+        margin-bottom: 2rem;
+        order: 1;
+    }
+
+    #terminal-output,
+    #input-area {
+        width: 100%;
+        max-width: 100%;
+        /* Fill the 720px container */
+    }
+
+    #terminal-output {
+        flex-grow: 1;
+        overflow-y: auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+}
+
+/* Mobile: Vertical Layout */
+@media (max-width: 767px) {
+    #terminal-container {
+        flex-direction: column;
+        justify-content: flex-start;
+        /* Start from top */
+    }
+
+    #visual-canvas {
+        display: none;
+        /* Hide by default to prevent layout gap */
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        margin: 0 auto 20px auto;
+        image-rendering: pixelated;
+        flex-shrink: 0;
+    }
+
+    /* Removed right-panel styles from mobile too */
+    /* right-panel was removed from HTML */
+
+    /* Mobile: Full Screen, Confined */
+    #terminal-container {
+        width: 100vw;
+        height: 100dvh;
+        /* Changed from 100vh to 100dvh to exclude browser UI */
+        padding: 5px;
+        /* Minimal padding for "No side margins" feel */
+        font-size: clamp(1.2rem, 4.5vw, 1.6rem);
+        /* Large optimized font */
+    }
+
+    #terminal-output {
+        width: 100%;
+        flex-grow: 1;
+        overflow-y: auto;
+        min-height: 0;
+        /* Enable scrolling */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start !important;
+        /* Force top alignment */
+        align-items: flex-start;
+        padding: calc(env(safe-area-inset-top) + 15px) 10px 20px 10px;
+        /* Minimal safe-area buffer */
+        /* Safe-area + base 40px */
+        margin: 0;
+        /* Reset margins */
+        box-sizing: border-box;
+        /* Fix padding calculation */
+    }
+
+    #terminal-output> :first-child {
+        margin-top: 0 !important;
+        /* Remove top margin from first element */
+    }
+}
+
+#input-area {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px;
+    font-size: inherit;
+    position: relative;
+    /* Context for absolute input */
+    padding-bottom: env(safe-area-inset-bottom);
+    /* Ensure input clears home bar */
+    box-sizing: border-box;
+    /* Ensure padding doesn't overflow width */
+    max-width: 100%;
+    /* Prevent overflow */
+}
+
+.prompt {
+    margin-right: 10px;
+    color: var(--text-color);
+    flex-shrink: 0;
+    /* Prevent prompt from shrinking */
+}
+
+#command-input {
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* Cover entire area */
+    height: 100%;
+    pointer-events: auto;
+    /* Enable direct interaction */
+    z-index: 10;
+    font-size: 16px;
+    /* Prevent zooming on iOS */
+    transform: scale(1);
+    box-sizing: border-box;
+    /* Fix width overflow */
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+#input-display {
+    white-space: pre-wrap;
+    /* Allow wrapping */
+    word-break: break-word;
+    /* Break long words */
+    color: var(--text-color);
+    min-height: 1.2em;
+    /* Ensure height if empty */
+    text-transform: lowercase;
+    /* Force visual lowercase */
+    /* flex-grow removed to keep cursor next to text */
+}
+
+.cursor {
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+.glitch {
+    animation: glitch-anim 0.3s infinite;
+}
+
+.warning {
+    color: #ff3333;
+    /* Red priority warning */
+}
+
+.system {
+    color: inherit;
+    /* Standard white text */
+}
+
+@keyframes glitch-anim {
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(-2px, -2px);
+    }
+
+    60% {
+        transform: translate(2px, 2px);
+    }
+
+    80% {
+        transform: translate(2px, -2px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+.ascii-art {
+    font-family: var(--font-main);
+    /* Strict monospace */
+    font-size: 8px;
+    /* Small text to fit the image */
+    line-height: 8px;
+    /* Condensed line height */
+    white-space: pre;
+    /* Preserve exact spacing */
+    color: var(--text-color);
+    margin: 20px 0;
+    opacity: 0.8;
+}
+
+/* Ensure terminal output allows pre-formatted content */
+#terminal-output .line.ascii-art {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.image-line canvas {
+    width: auto;
+    max-width: 80%;
+    height: auto;
+    max-height: 50vh;
+    /* Restrict height to 50% viewport for initial visibility */
+    image-rendering: pixelated;
+    margin: 10px auto;
+    display: block;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom Scrollbar (CMD Style) */
+::-webkit-scrollbar {
+    width: 12px;
+    background: #000;
+}
+
+::-webkit-scrollbar-track {
+    background: #000;
+    border-left: 1px solid #333;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-color);
+    border: 2px solid #000;
+    /* Create blocky look */
+    /* No radius for blocky feel */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #fff;
+}
+
+/* Button Styles */
+.terminal-button {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 10px 0;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    color: var(--text-color);
+    position: relative;
+    z-index: 10;
+}
+
+.restart-button {
+    font-size: 1.5rem;
+    padding: 15px 40px;
+    border: 2px solid var(--text-color);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    text-align: center;
+    width: 80%;
+    max-width: 300px;
+    margin: auto auto 30px auto;
+    /* Push to bottom */
+    display: block;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.restart-button:hover {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.terminal-button:hover,
+.terminal-button.active {
+    color: var(--accent-color);
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid var(--accent-color);
+}
+
+.terminal-button.command-style {
+    padding-left: 0;
+    background: none !important;
+    border: none !important;
+}
+
+.terminal-button.command-style:hover {
+    text-decoration: underline;
+}
+
+.bottom-aligned {
+    margin-top: auto !important;
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: left;
+    /* User requested left alignment */
+    box-sizing: border-box;
+    /* Prevent padding from causing overflow */
+}
+
+.terminal-button.exit-button {
+    border: 1px solid var(--text-color);
+    width: 60%;
+    /* Reasonable width */
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    /* Center block */
+    text-align: center;
+}
+
+/* Intro Screen Styles */
+#intro-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-color);
+    z-index: 9999;
+    /* Force to top */
+    animation: fadeIn 1s ease-in;
+}
+
+.intro-content {
+    text-align: center;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    line-height: 1.5;
+    /* Fixed clipping issue */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.intro-button {
+    margin-top: 30px;
+    cursor: pointer;
+    color: var(--text-color);
+    animation: blink 1.5s infinite;
+}
+
+.intro-button:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Mobile Intro Centering Fix */
+@media (max-width: 767px) {
+    #intro-screen {
+        height: 100dvh;
+        /* Use dynamic viewport height */
+        align-items: center;
+        justify-content: center;
+        /* Ensure horizontal centering too */
+        padding-top: 0;
+        /* Remove padding to maximize centering space */
+        padding-bottom: env(safe-area-inset-bottom);
+        box-sizing: border-box;
+        /* Include padding in height */
+    }
+
+    #terminal-output {
+        padding-top: calc(env(safe-area-inset-top) + 75px) !important;
+        /* Start 10px below safe area */
+    }
+
+    .intro-content {
+        margin: 0;
+        /* Reset margins */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        /* Ensure full width for centering text */
+        line-height: 0.5;
+        /* Tighter line height for mobile */
+        transform: translateY(-20%);
+        /* Move slightly above center */
+    }
+}

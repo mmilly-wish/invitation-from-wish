@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>Invitation from Wish</title>
+    <link rel="icon" type="image/png" href="assets/ring.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sound-guide.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+</head>
+
+<body>
+    <div id="crt-overlay"></div>
+    <div id="scanline"></div>
+
+    <!-- Sound Guide Notification (Auto-dismiss) -->
+    <div id="sound-guide" class="hidden">
+        <div class="sound-guide-content">
+            <div class="sound-icon-large">🎧</div>
+            <p class="sound-guide-text">
+                더 나은 경험을 위해<br>
+                <strong>사운드를 켜주세요</strong>
+            </p>
+        </div>
+    </div>
+
+    <div id="intro-screen">
+        <div class="intro-content">
+            <p>6명의 왕자가 당신에게 청혼했습니다.</p>
+            <p>그들에 대한 기록을 열람하시겠습니까?</p>
+            <div id="start-btn" class="intro-button">&gt; archive에 접근하기</div>
+        </div>
+    </div>
+
+    <main id="terminal-container" class="hidden">
+        <canvas id="visual-canvas"></canvas>
+        <div id="terminal-output">
+            <div id="input-area" class="hidden">
+                <span class="prompt">&gt;</span>
+                <span id="input-display"></span>
+                <span class="cursor">_</span>
+                <input type="text" id="command-input" autocomplete="off" autocorrect="off" autocapitalize="off"
+                    spellcheck="false">
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
