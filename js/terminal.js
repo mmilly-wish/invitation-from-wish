@@ -251,9 +251,19 @@ export class Terminal {
             btn.style.marginTop = '10px';
             btn.style.display = 'inline-block';
 
+            const handler = () => {
+                btn.removeEventListener('click', handler);
+                btn.removeEventListener('touchstart', handler);
+                btn.style.pointerEvents = 'none'; // Prevent double clicks
+                audio.playBeep(1200, 0.1);
+                resolve();
+            };
+
+            btn.addEventListener('click', handler);
+            btn.addEventListener('touchstart', handler, { passive: true });
+
             this.output.insertBefore(btn, this.inputArea);
             this.scrollToBottom();
-            // ...
         });
     }
 
