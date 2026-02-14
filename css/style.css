@@ -85,6 +85,8 @@ body {
     position: relative;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    /* Start from top on all screen sizes */
     z-index: 10;
 }
 
@@ -142,6 +144,8 @@ body {
         flex-direction: column;
         justify-content: flex-start;
         /* Start from top */
+        margin-top: 0;
+        /* Stick to top but respect safe area */
     }
 
     #visual-canvas {
@@ -161,6 +165,10 @@ body {
 
     /* Mobile: Full Screen, Confined */
     #terminal-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        /* Force to top of viewport */
         width: 100vw;
         height: 100dvh;
         /* Changed from 100vh to 100dvh to exclude browser UI */
@@ -168,6 +176,8 @@ body {
         /* Minimal padding for "No side margins" feel */
         font-size: clamp(1.2rem, 4.5vw, 1.6rem);
         /* Large optimized font */
+        justify-content: flex-start !important;
+        /* Override desktop center alignment - start from top */
     }
 
     #terminal-output {
@@ -181,18 +191,22 @@ body {
         justify-content: flex-start !important;
         /* Force top alignment */
         align-items: flex-start;
-        padding: calc(env(safe-area-inset-top) + 15px) 10px 20px 10px;
-        /* Minimal safe-area buffer */
-        /* Safe-area + base 40px */
+        padding: 5px 10px 20px 10px;
+        /* Minimal top padding, safe-area handled by first-child margin */
         margin: 0;
         /* Reset margins */
         box-sizing: border-box;
         /* Fix padding calculation */
     }
 
-    #terminal-output> :first-child {
+    #terminal-output>.line {
         margin-top: 0 !important;
-        /* Remove top margin from first element */
+        /* Reset all line margins */
+    }
+
+    #terminal-output>.line:first-of-type {
+        margin-top: 10px !important;
+        /* Position first line below status bar on iPhone 14 Pro */
     }
 }
 
@@ -503,11 +517,6 @@ body {
         padding-bottom: env(safe-area-inset-bottom);
         box-sizing: border-box;
         /* Include padding in height */
-    }
-
-    #terminal-output {
-        padding-top: calc(env(safe-area-inset-top) + 75px) !important;
-        /* Start 10px below safe area */
     }
 
     .intro-content {

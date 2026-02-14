@@ -17,14 +17,14 @@ export class Terminal {
         // iOS Keyboard Fix:
         // Use focus event on the input itself, which now covers the area
         this.input.addEventListener('focus', () => {
-            // Delay to allow keyboard to appear
+            // Disabled scrolling to keep content visible when typing
+            // User requested to see content while typing "load princes"
+            /* 
             setTimeout(() => {
-                // Method 1: Scroll element into view
                 this.inputArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                // Method 2: Force window scroll to bottom as backup
                 window.scrollTo(0, document.body.scrollHeight);
-            }, 300); // 300ms delay for keyboard animation
+            }, 300);
+            */
         });
 
         // Keep direct click as fallback/backup
